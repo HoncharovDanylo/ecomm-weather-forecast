@@ -1,0 +1,52 @@
+name: Lab 4 Grading
+
+on:
+  push:
+    branches: ["**"]
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set image name (lowercase)
+        id: image
+        run: |
+          OWNER_LC=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          echo "name=ghcr.io/${OWNER_LC}/ecommerce-app" >> $GITHUB_OUTPUT
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build Docker image locally
+        run: |
+          docker build -t ${{ steps.image.outputs.name }}:latest \
+            -f WeatherForecast.Api/Dockerfile .
+
+      - name: Create KinD cluster
+        uses: helm/kind-action@v1.10.0
+        with:
+          cluster_name: lab4-cluster
+
+      - name: Load image into KinD
+        run: |
+          kind load docker-image ${{ steps.image.outputs.name }}:latest --name lab4-cluster
+
+      - name: Install Helm
+        uses: azure/setup-helm@v4
+
+      - name: Run Grading Script
+        run: |
+          chmod +x ./Tests/lab4_test.sh
+          ./Tests/lab4_test.sh
