@@ -21,10 +21,10 @@ spec:
           ports:
             - containerPort: 80
           envFrom:
-            - configMapRef:
-                name: ecommerce-app-config
             - secretRef:
                 name: ecommerce-app-secret
+            - configMapRef:
+                name: ecommerce-app-config
           livenessProbe:
             httpGet:
               path: /health
