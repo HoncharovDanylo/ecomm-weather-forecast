@@ -1,0 +1,49 @@
+version: '3.8'
+
+networks:
+  dev:
+    driver: bridge
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: WeatherForecast.Api/Dockerfile
+    container_name: app
+    ports:
+      - "8080:80"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - ConnectionStrings__DefaultConnection=${DB_CONNECTION_STRING}
+      - ASPNETCORE_URLS=http://+:80
+      - MainConfiguration__GeocodingApiKey=${GEOCODING_API_KEY}
+      - MainConfiguration__OpenWeatherApiKey=${OPEN_WEATHER_API_KEY}
+      - MainConfiguration__TelegramBotToken=${TELEGRAM_BOT_TOKEN}
+      - MainConfiguration__InternalApiKey=${INTERNAL_API_KEY}
+    networks:
+      - dev
+
+  db:
+    image: postgres:15-alpine
+    container_name: app_db
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+    ports:
+      - "5433:5432"
+    restart: always
+    volumes:
+      - app_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - dev
+
+volumes:
+  app_data:
