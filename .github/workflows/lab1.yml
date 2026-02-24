@@ -1,0 +1,41 @@
+name: Lab 1 Grading
+
+on: [push]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Tools
+        run: sudo apt-get update && sudo apt-get install -y jq curl
+
+      - name: Build and Start
+        env:
+          DB_USER: postgres
+          DB_PASSWORD: admin
+          DB_NAME: forecast
+          DB_CONNECTION_STRING: Host=db;Port=5432;Database=forecast;Username=postgres;Password=admin
+          GEOCODING_API_KEY: ${{ secrets.GEOCODING_API_KEY }}
+          OPEN_WEATHER_API_KEY: ${{ secrets.OPEN_WEATHER_API_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          INTERNAL_API_KEY: ${{ secrets.INTERNAL_API_KEY }}
+        run: docker compose up -d
+
+      - name: Wait for Readiness
+        run: |
+          for i in {1..15}; do
+            if curl -s localhost:8080/health; then
+              echo "App is ready!"
+              break
+            fi
+            echo "Waiting..."
+            sleep 3
+          done
+
+      - name: Run Grading Script
+        run: |
+          chmod +x ./Tests/lab1_test.sh
+          ./Tests/lab1_test.sh
