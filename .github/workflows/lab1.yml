@@ -37,5 +37,5 @@ jobs:
 
       - name: Run Grading Script
         run: |
-          chmod +x ./tests/lab1_test.sh
-          ./tests/lab1_test.sh
+          chmod +x ./Tests/lab1_test.sh
+          ./Tests/lab1_test.sh
