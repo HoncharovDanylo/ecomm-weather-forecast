@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ecommerce-app-config
+data:
+  DB_HOST: {{ .Values.configMap.dbHost | quote }}
+  DB_NAME: {{ .Values.configMap.dbName | quote }}
+  DB_PORT: {{ .Values.configMap.dbPort | quote }}
+  ASPNETCORE_URLS: {{ .Values.configMap.aspnetUrls | quote }}
+  IsHangfireDashboardEnabled: {{ .Values.configMap.isHangfireDashboardEnabled | quote }}
+  IsSwaggerDisabled: {{ .Values.configMap.isSwaggerDisabled | quote }}
+  MainConfiguration__IsTelegramIntegrationEnabled: {{ .Values.configMap.telegramIntegrationEnabled | quote }}
+  MainConfiguration__TelegramBotApi: {{ .Values.configMap.telegramBotApi | quote }}
+  MainConfiguration__OpenWeatherUrl: {{ .Values.configMap.openWeatherUrl | quote }}
