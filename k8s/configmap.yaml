@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ecommerce-app-config
+data:
+  DB_HOST: "postgres-service"
+  DB_NAME: "forecast"
+  DB_PORT: "5432"
+  ASPNETCORE_URLS: "http://+:80"
+  IsHangfireDashboardEnabled: "true"
+  IsSwaggerDisabled: "false"
+  MainConfiguration__IsTelegramIntegrationEnabled: "true"
+  MainConfiguration__TelegramBotApi: "https://api.telegram.org/bot"
+  MainConfiguration__OpenWeatherUrl: "https://api.openweathermap.org/data/2.5/"
